@@ -3,580 +3,289 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PROVISIONING NEW SALES INDIBIZ TR3 JBN MTD H-1</title>
+    <title>Dashboard Update Lapangan & Keterangan Order</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SheetJS (xlsx) -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f8fafc;
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(226, 232, 240, 0.8);
-        }
-    </style>
+    <!-- PapaParse CDN untuk Parse CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
 
     <!-- Header -->
-    <header class="bg-gradient-to-r from-red-700 via-red-600 to-rose-700 text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div class="w-full md:w-auto">
-                    <div class="flex items-start space-x-3">
-                        <span class="bg-white/20 p-2.5 rounded-xl backdrop-blur-md mt-1 flex-shrink-0">
-                            <i class="fa-solid fa-chart-line text-2xl"></i>
-                        </span>
-                        <div class="flex-1">
-                            <!-- Judul Utama 1 Baris Utuh -->
-                            <h1 class="text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold tracking-tight uppercase whitespace-nowrap">
-                                PROVISIONING NEW SALES INDIBIZ TR3 JBN MTD H-1
-                            </h1>
-                            
-                            <!-- Subtitle Detail 3 Baris -->
-                            <div class="text-red-100 text-xs sm:text-sm mt-1 space-y-0.5" id="subtitle-info">
-                                <p id="info-tgl-report"><i class="fa-regular fa-calendar-check mr-1"></i> Tanggal Report : -</p>
-                                <p id="info-periode"><i class="fa-regular fa-clock mr-1"></i> PERIODE ORDER & PS : -</p>
-                                <p id="info-last-update"><i class="fa-solid fa-rotate mr-1"></i> Last update proses : -</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Github & Input Config -->
-                <div class="flex flex-wrap items-center gap-3">
-                    <div class="relative flex-1 sm:w-80">
-                        <input type="text" id="github-url" 
-                               value="https://raw.githubusercontent.com/dediriant3-a11y/dashboard-ReportJBN/main/data.xlsx" 
-                               placeholder="URL Raw GitHub data.xlsx" 
-                               class="w-full pl-9 pr-3 py-2 text-xs text-slate-900 rounded-lg border-0 shadow-inner focus:ring-2 focus:ring-red-300 font-mono">
-                        <i class="fa-brands fa-github absolute left-3 top-2.5 text-slate-400 text-sm"></i>
-                    </div>
-                    <button onclick="fetchDataFromGitHub()" 
-                            class="bg-white text-red-700 hover:bg-red-50 font-bold px-4 py-2 rounded-lg text-xs shadow transition duration-200 flex items-center gap-1.5">
-                        <i class="fa-solid fa-sync" id="btn-sync-icon"></i> Muat Data GitHub
-                    </button>
-                    <label class="bg-red-800 hover:bg-red-900 text-white font-semibold px-3 py-2 rounded-lg text-xs shadow cursor-pointer transition duration-200 flex items-center gap-1.5">
-                        <i class="fa-solid fa-upload"></i> Upload Lokal
-                        <input type="file" id="file-input" accept=".xlsx, .xls" class="hidden" onchange="handleFileUpload(event)">
-                    </label>
-                </div>
+    <header class="bg-indigo-700 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight">Dashboard Proyek WMS Sabu Raijua</h1>
+                <p class="text-indigo-200 text-sm mt-1">Monitoring Update Lapangan & Keterangan Order (Real-time CSV)</p>
             </div>
+            <button onclick="fetchData()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow flex items-center gap-2">
+                <i class="fa-solid font-bold fa-rotate"></i> Refresh Data
+            </button>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
 
-        <!-- Notification Banner -->
-        <div id="status-message" class="hidden p-4 rounded-xl text-sm font-semibold flex items-center justify-between shadow-sm"></div>
-
-        <!-- KPI Cards Grid -->
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
-            <!-- Card 1: TOTAL RE -->
-            <div class="glass-card rounded-2xl p-5 shadow-sm hover:shadow-md transition">
-                <div class="flex items-center justify-between text-slate-500 mb-2">
-                    <span class="text-xs font-bold uppercase tracking-wider">TOTAL RE</span>
-                    <span class="p-2 bg-blue-50 text-blue-600 rounded-lg"><i class="fa-solid fa-clipboard-list"></i></span>
-                </div>
-                <div class="text-3xl font-extrabold text-slate-900" id="kpi-re">0</div>
-                <div class="text-xs text-slate-500 mt-1">Register Total</div>
+        <!-- Metrics Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 mb-8">
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Lokasi</p>
+                <h3 class="text-3xl font-extrabold text-slate-800 mt-2" id="total-lokasi">0</h3>
             </div>
-
-            <!-- Card 2: TOTAL PI -->
-            <div class="glass-card rounded-2xl p-5 shadow-sm hover:shadow-md transition">
-                <div class="flex items-center justify-between text-slate-500 mb-2">
-                    <span class="text-xs font-bold uppercase tracking-wider">TOTAL PI</span>
-                    <span class="p-2 bg-purple-50 text-purple-600 rounded-lg"><i class="fa-solid fa-spinner"></i></span>
-                </div>
-                <div class="text-3xl font-extrabold text-slate-900" id="kpi-pi">0</div>
-                <div class="text-xs text-slate-500 mt-1">Provisioning Issued</div>
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-emerald-500">
+                <p class="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Order Complete</p>
+                <h3 class="text-3xl font-extrabold text-emerald-600 mt-2" id="total-complete">0</h3>
             </div>
-
-            <!-- Card 3: TOTAL QC2 -->
-            <div class="glass-card rounded-2xl p-5 shadow-sm hover:shadow-md transition">
-                <div class="flex items-center justify-between text-slate-500 mb-2">
-                    <span class="text-xs font-bold uppercase tracking-wider">TOTAL QC2</span>
-                    <span class="p-2 bg-amber-50 text-amber-600 rounded-lg"><i class="fa-solid fa-list-check"></i></span>
-                </div>
-                <div class="text-3xl font-extrabold text-slate-900" id="kpi-qc2">0</div>
-                <div class="text-xs text-slate-500 mt-1">Quality Control</div>
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-amber-500">
+                <p class="text-xs font-semibold text-amber-600 uppercase tracking-wider">Order In Progress</p>
+                <h3 class="text-3xl font-extrabold text-amber-600 mt-2" id="total-inprogress">0</h3>
             </div>
-
-            <!-- Card 4: TOTAL FALLOUT -->
-            <div class="glass-card rounded-2xl p-5 shadow-sm hover:shadow-md transition">
-                <div class="flex items-center justify-between text-slate-500 mb-2">
-                    <span class="text-xs font-bold uppercase tracking-wider">TOTAL FALLOUT</span>
-                    <span class="p-2 bg-rose-50 text-rose-600 rounded-lg"><i class="fa-solid fa-triangle-exclamation"></i></span>
-                </div>
-                <div class="text-3xl font-extrabold text-rose-600" id="kpi-fallout">0</div>
-                <div class="text-xs text-slate-500 mt-1">Kendala</div>
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-blue-500">
+                <p class="text-xs font-semibold text-blue-600 uppercase tracking-wider">DONE PT1</p>
+                <h3 class="text-3xl font-extrabold text-blue-600 mt-2" id="total-done-pt1">0</h3>
             </div>
-
-            <!-- Card 5: TOTAL PS -->
-            <div class="glass-card rounded-2xl p-5 shadow-sm hover:shadow-md transition">
-                <div class="flex items-center justify-between text-slate-500 mb-2">
-                    <span class="text-xs font-bold uppercase tracking-wider">TOTAL PS</span>
-                    <span class="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><i class="fa-solid fa-circle-check"></i></span>
-                </div>
-                <div class="text-3xl font-extrabold text-emerald-600" id="kpi-ps">0</div>
-                <div class="text-xs text-slate-500 mt-1">Provisioning Success</div>
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-purple-500">
+                <p class="text-xs font-semibold text-purple-600 uppercase tracking-wider">Proses PT1</p>
+                <h3 class="text-3xl font-extrabold text-purple-600 mt-2" id="total-proses-pt1">0</h3>
             </div>
-        </section>
+        </div>
 
-        <!-- Charts Section (Grafik Batang & Pie Chart) -->
-        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Grafik Batang PS per Witel -->
-            <div class="lg:col-span-2 glass-card rounded-2xl p-6 shadow-sm border border-slate-200">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h3 class="text-base font-bold text-slate-900">Total Provisioning Success (PS) Per Witel</h3>
-                        <p class="text-xs text-slate-500">Perbandingan jumlah order PS sukses antar Witel</p>
-                    </div>
-                    <span class="p-2 bg-emerald-50 text-emerald-600 rounded-lg text-sm"><i class="fa-solid fa-chart-column"></i></span>
-                </div>
-                <div class="h-64 sm:h-72">
-                    <canvas id="psBarChart"></canvas>
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h2 class="text-lg font-bold text-slate-800 mb-4">Statistik Keterangan Order (Kolom O)</h2>
+                <div class="relative h-64 flex justify-center">
+                    <canvas id="orderChart"></canvas>
                 </div>
             </div>
-
-            <!-- Grafik Pie Komposisi Status -->
-            <div class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h3 class="text-base font-bold text-slate-900">Komposisi Status Order</h3>
-                        <p class="text-xs text-slate-500">Persentase tahapan status order regional</p>
-                    </div>
-                    <span class="p-2 bg-indigo-50 text-indigo-600 rounded-lg text-sm"><i class="fa-solid fa-chart-pie"></i></span>
-                </div>
-                <div class="h-64 sm:h-72 flex items-center justify-center">
-                    <canvas id="statusPieChart"></canvas>
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <h2 class="text-lg font-bold text-slate-800 mb-4">Statistik Update Lapangan (Kolom N)</h2>
+                <div class="relative h-64 flex justify-center">
+                    <canvas id="lapanganChart"></canvas>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- Main Data Table -->
-        <section class="glass-card rounded-2xl shadow-sm overflow-hidden border border-slate-200">
-            <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                    <h2 class="text-lg font-bold text-slate-900">Rincian Per Witel</h2>
-                    <p class="text-xs text-slate-500 mt-0.5">Monitoring performa pengerjaan order per Witel beserta persentase target pencapaian.</p>
-                </div>
-                <div class="flex items-center gap-3">
-                    <span class="inline-flex items-center text-xs font-medium text-slate-600 gap-1.5 bg-slate-100 px-3 py-1.5 rounded-lg">
-                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Target Tercapai
-                    </span>
-                    <span class="inline-flex items-center text-xs font-medium text-slate-600 gap-1.5 bg-slate-100 px-3 py-1.5 rounded-lg">
-                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Di Bawah Target
-                    </span>
+        <!-- Table Section -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <h2 class="text-lg font-bold text-slate-800">Detail Data Lokasi</h2>
+                <div class="flex flex-wrap gap-3 w-full sm:w-auto">
+                    <!-- Search Input -->
+                    <input type="text" id="search-input" onkeyup="filterTable()" placeholder="Cari nama lokasi..." 
+                        class="px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 flex-1 sm:w-64">
+                    <!-- Filter Select -->
+                    <select id="filter-select" onchange="filterTable()" 
+                        class="px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="">Semua Status Order</option>
+                        <option value="Complete">Complete</option>
+                        <option value="In Progress">In Progress</option>
+                    </select>
                 </div>
             </div>
 
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
-                        <tr class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200 text-xs tracking-wider">
-                            <th class="py-4 px-4">WITEL</th>
-                            <th class="py-4 px-3 text-right">RE</th>
-                            <th class="py-4 px-3 text-right">PRE PI</th>
-                            <th class="py-4 px-3 text-right">PI</th>
-                            <th class="py-4 px-3 text-right">FALLOUT</th>
-                            <th class="py-4 px-3 text-right">QC2</th>
-                            <th class="py-4 px-3 text-right">PS</th>
-                            <th class="py-4 px-4 text-center">PS/RE (%)<br><span class="text-[10px] font-normal text-slate-500">(Target 80%)</span></th>
-                            <th class="py-4 px-4 text-center">PS/PI (%)<br><span class="text-[10px] font-normal text-slate-500">(Target 94%)</span></th>
-                            <th class="py-4 px-4 text-center">TTI COMPLY<br><span class="text-[10px] font-normal text-slate-500">(Target 94%)</span></th>
+                        <tr class="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200">
+                            <th class="py-3 px-4 w-12 text-center">No</th>
+                            <th class="py-3 px-4">Nama Lokasi</th>
+                            <th class="py-3 px-4">Alamat</th>
+                            <th class="py-3 px-4 text-center">Update Lapangan (Kolom N)</th>
+                            <th class="py-3 px-4 text-center">Keterangan Order (Kolom O)</th>
                         </tr>
                     </thead>
-                    <tbody id="table-body" class="divide-y divide-slate-100 text-slate-700">
+                    <tbody id="table-body" class="divide-y divide-slate-200">
                         <tr>
-                            <td colspan="10" class="py-8 text-center text-slate-400">
-                                <i class="fa-solid fa-spinner fa-spin text-2xl mb-2"></i>
-                                <p>Sedang memuat data...</p>
-                            </td>
+                            <td colspan="5" class="text-center py-8 text-slate-400">Memuat data...</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-        </section>
-
-        <!-- Keterangan SLA WISA 2026 -->
-        <section class="glass-card rounded-2xl p-6 shadow-sm border border-slate-200">
-            <h3 class="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
-                <i class="fa-solid fa-circle-info text-red-600"></i> * SLA WISA 2026
-            </h3>
-            <ol class="list-decimal list-inside text-xs text-slate-700 space-y-1.5 font-medium">
-                <li><span class="font-semibold text-slate-900">TTI Compliance HSI (AO/MO)</span> | 1x24 jam 94%</li>
-                <li><span class="font-semibold text-slate-900">Compliance Order Aging (AOSODOMORO)</span> 3x24 jam 90%</li>
-                <li><span class="font-semibold text-slate-900">PS to PI Ratio HSI (AO/MO/PDA)</span> 94%</li>
-                <li><span class="font-semibold text-slate-900">Fallout Order HSI (AOSODOMORO)</span> 1x12 jam &gt; 90%</li>
-            </ol>
-        </section>
+        </div>
 
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200 py-4 mt-auto">
-        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
-            &copy; 2026 Dashboard Indibiz TR3 JBN. Automated Sheet4 Reader.
-        </div>
-    </footer>
-
-    <!-- JavaScript Script -->
     <script>
-        const TARGET_PS_RE = 0.80; 
-        const TARGET_PS_PI = 0.94; 
-        const TARGET_TTI = 0.94;   
+        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT5rK9llpYFLuSVfDSOHqXTM56CAUSNu4kr-6dIEb3JIVMuEqIty-VvCIo9Y6hnA5CvkRSPFATqlVRt/pub?output=csv";
+        
+        let globalData = [];
+        let orderChartInstance = null;
+        let lapanganChartInstance = null;
 
-        let psBarChartInstance = null;
-        let statusPieChartInstance = null;
-
-        function formatPercent(val) {
-            if (val === null || val === undefined || isNaN(val)) return '-';
-            return (val * 100).toFixed(2).replace('.', ',') + '%';
-        }
-
-        function formatNumber(val) {
-            if (val === null || val === undefined || isNaN(val)) return '0';
-            return Number(val).toLocaleString('id-ID');
-        }
-
-        function getBadgeHtml(value, target) {
-            if (value === null || value === undefined || isNaN(value)) return '-';
-            const pctText = formatPercent(value);
-            const isSuccess = value >= target;
-
-            if (isSuccess) {
-                return `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                            <i class="fa-solid fa-circle-check text-[10px]"></i> ${pctText}
-                        </span>`;
-            } else {
-                return `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-200">
-                            <i class="fa-solid fa-circle-xmark text-[10px]"></i> ${pctText}
-                        </span>`;
-            }
-        }
-
-        function showStatus(message, type = 'info') {
-            const el = document.getElementById('status-message');
-            el.classList.remove('hidden', 'bg-blue-100', 'text-blue-800', 'bg-red-100', 'text-red-800', 'bg-emerald-100', 'text-emerald-800');
-            
-            if (type === 'error') {
-                el.classList.add('bg-red-100', 'text-red-800');
-            } else if (type === 'success') {
-                el.classList.add('bg-emerald-100', 'text-emerald-800');
-            } else {
-                el.classList.add('bg-blue-100', 'text-blue-800');
-            }
-            el.innerHTML = message;
-
-            // Otomatis menyembunyikan banner setelah 3 detik jika status sukses
-            if (type === 'success') {
-                setTimeout(() => {
-                    el.classList.add('hidden');
-                }, 3000);
-            }
-        }
-
-        function renderCharts(witelNames, psValues, totalStatusData) {
-            // 1. Render Bar Chart (Grafik Batang PS per Witel)
-            const barCtx = document.getElementById('psBarChart').getContext('2d');
-            if (psBarChartInstance) psBarChartInstance.destroy();
-
-            psBarChartInstance = new Chart(barCtx, {
-                type: 'bar',
-                data: {
-                    labels: witelNames,
-                    datasets: [{
-                        label: 'Jumlah Order PS',
-                        data: psValues,
-                        backgroundColor: '#10b981',
-                        hoverBackgroundColor: '#059669',
-                        borderRadius: 8,
-                        borderSkipped: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return ` Total PS: ${formatNumber(context.raw)}`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            grid: { display: false },
-                            ticks: { font: { family: 'Plus Jakarta Sans', weight: '600' } }
-                        },
-                        y: {
-                            grid: { color: '#f1f5f9' },
-                            beginAtZero: true
-                        }
+        async function fetchData() {
+            try {
+                const response = await fetch(CSV_URL);
+                const csvText = await response.text();
+                
+                Papa.parse(csvText, {
+                    header: false,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        processData(results.data);
                     }
+                });
+            } catch (error) {
+                console.error("Gagal mengambil data CSV:", error);
+                document.getElementById('table-body').innerHTML = `
+                    <tr><td colspan="5" class="text-center py-6 text-red-500 font-semibold">Gagal memuat data dari Google Sheets Web Publish.</td></tr>
+                `;
+            }
+        }
+
+        function processData(rows) {
+            // Indeks Kolom: 
+            // 0: No, 1: Nama Lokasi, 5: Alamat, 13: Update lapangan (N), 14: Keterangan Order (O)
+            const cleanRows = [];
+            
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                const no = row[0] ? row[0].trim() : '';
+                const namaLokasi = row[1] ? row[1].trim() : '';
+                const alamat = row[5] ? row[5].trim() : '';
+                const updateLapangan = row[13] ? row[13].trim() : '-';
+                const ketOrder = row[14] ? row[14].trim() : '-';
+
+                // Validasi baris data (bukan header/kosong)
+                if (no && !isNaN(no) && namaLokasi) {
+                    cleanRows.push({
+                        no,
+                        namaLokasi,
+                        alamat,
+                        updateLapangan,
+                        ketOrder
+                    });
                 }
+            }
+
+            globalData = cleanRows;
+            renderMetrics(cleanRows);
+            renderCharts(cleanRows);
+            renderTable(cleanRows);
+        }
+
+        function renderMetrics(data) {
+            document.getElementById('total-lokasi').textContent = data.length;
+            
+            const complete = data.filter(d => d.ketOrder.toLowerCase() === 'complete').length;
+            const inProgress = data.filter(d => d.ketOrder.toLowerCase() === 'in progress').length;
+            const donePt1 = data.filter(d => d.updateLapangan.toLowerCase() === 'done pt1').length;
+            const prosesPt1 = data.filter(d => d.updateLapangan.toLowerCase() === 'proses pt1').length;
+
+            document.getElementById('total-complete').textContent = complete;
+            document.getElementById('total-inprogress').textContent = inProgress;
+            document.getElementById('total-done-pt1').textContent = donePt1;
+            document.getElementById('total-proses-pt1').textContent = prosesPt1;
+        }
+
+        function renderCharts(data) {
+            // Count data for Order Chart
+            const orderCounts = {};
+            const lapanganCounts = {};
+
+            data.forEach(d => {
+                orderCounts[d.ketOrder] = (orderCounts[d.ketOrder] || 0) + 1;
+                lapanganCounts[d.updateLapangan] = (lapanganCounts[d.updateLapangan] || 0) + 1;
             });
 
-            // 2. Render Pie Chart (Grafik Komposisi Status)
-            const pieCtx = document.getElementById('statusPieChart').getContext('2d');
-            if (statusPieChartInstance) statusPieChartInstance.destroy();
+            // Destroy previous charts if exist
+            if (orderChartInstance) orderChartInstance.destroy();
+            if (lapanganChartInstance) lapanganChartInstance.destroy();
 
-            statusPieChartInstance = new Chart(pieCtx, {
+            // Order Pie Chart
+            const ctxOrder = document.getElementById('orderChart').getContext('2d');
+            orderChartInstance = new Chart(ctxOrder, {
                 type: 'doughnut',
                 data: {
-                    labels: ['PRE PI', 'PI (Proses)', 'Fallout (Kendala)', 'QC2', 'PS (Sukses)'],
+                    labels: Object.keys(orderCounts),
                     datasets: [{
-                        data: [
-                            totalStatusData.prepi,
-                            totalStatusData.pi,
-                            totalStatusData.fallout,
-                            totalStatusData.qc2,
-                            totalStatusData.ps
-                        ],
-                        backgroundColor: [
-                            '#3b82f6', 
-                            '#a855f7', 
-                            '#f43f5e', 
-                            '#f59e0b', 
-                            '#10b981'  
-                        ],
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
+                        data: Object.values(orderCounts),
+                        backgroundColor: ['#10b981', '#f59e0b', '#64748b']
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                boxWidth: 12,
-                                padding: 15,
-                                font: { family: 'Plus Jakarta Sans', size: 11 }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const value = context.raw || 0;
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const pct = total ? ((value / total) * 100).toFixed(1) + '%' : '0%';
-                                    return ` ${context.label}: ${formatNumber(value)} (${pct})`;
-                                }
-                            }
-                        }
-                    },
-                    cutout: '65%'
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+
+            // Lapangan Bar Chart
+            const ctxLapangan = document.getElementById('lapanganChart').getContext('2d');
+            lapanganChartInstance = new Chart(ctxLapangan, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(lapanganCounts),
+                    datasets: [{
+                        label: 'Jumlah Lokasi',
+                        data: Object.values(lapanganCounts),
+                        backgroundColor: ['#3b82f6', '#a855f7', '#94a3b8']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
                 }
             });
         }
 
-        function processWorkbook(workbook) {
-            try {
-                if (!workbook.SheetNames.includes('Sheet4')) {
-                    showStatus('<i class="fa-solid fa-triangle-exclamation mr-2"></i> Sheet4 tidak ditemukan dalam file excel!', 'error');
-                    return;
-                }
+        function renderTable(data) {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
 
-                const sheet = workbook.Sheets['Sheet4'];
-                const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: true });
-
-                let tglReportVal = "";
-                let periodeVal = "";
-                let lastUpdateVal = "";
-                let headersRowIdx = -1;
-                let colIndices = {};
-
-                // Find header row dynamically and extract header info
-                for (let i = 0; i < jsonData.length; i++) {
-                    const row = jsonData[i] || [];
-                    const rowStr = row.map(c => String(c || '')).join(' ');
-
-                    if (rowStr.includes('Tanggal Report')) {
-                        const cellVal = row.find(c => c && String(c).includes('Tanggal Report'));
-                        if (cellVal) tglReportVal = cellVal;
-                    }
-                    if (rowStr.includes('PERIODE ORDER & PS')) {
-                        const cellVal = row.find(c => c && String(c).includes('PERIODE ORDER'));
-                        if (cellVal) periodeVal = cellVal;
-                    }
-                    if (rowStr.includes('Last update proses')) {
-                        const cellVal = row.find(c => c && String(c).includes('Last update'));
-                        if (cellVal) lastUpdateVal = cellVal;
-                    }
-
-                    // Check if row has column headers
-                    for (let j = 0; j < row.length; j++) {
-                        const cell = String(row[j] || '').trim();
-                        if (cell === 'WITEL') headersRowIdx = i;
-                    }
-                }
-
-                if (headersRowIdx === -1) {
-                    showStatus('<i class="fa-solid fa-triangle-exclamation mr-2"></i> Baris header WITEL tidak ditemukan!', 'error');
-                    return;
-                }
-
-                // Update Header Subtitle Info
-                // Mengambil tanggal hari ini dalam format YYYY-MM-DD
-                const today = new Date().toISOString().split('T')[0];
-
-                document.getElementById('info-tgl-report').innerHTML = `<i class="fa-regular fa-calendar-check mr-1"></i> ${tglReportVal || 'Tanggal Report : ' + today}`;
-                document.getElementById('info-periode').innerHTML = `<i class="fa-regular fa-clock mr-1"></i> ${periodeVal || 'PERIODE ORDER & PS : 2026-08-01 to 2026-08-26'}`;
-                document.getElementById('info-last-update').innerHTML = `<i class="fa-solid fa-rotate mr-1"></i> ${lastUpdateVal || 'Last update proses : 26-08-2026 07:34:14 WIB (Source: ETL XPRO)'}`;
-
-                // Map header column names to column index
-                const headerRow = jsonData[headersRowIdx];
-                for (let j = 0; j < headerRow.length; j++) {
-                    const cell = String(headerRow[j] || '').trim().toUpperCase();
-                    if (cell.includes('WITEL')) colIndices['WITEL'] = j;
-                    else if (cell.includes('REGISTER') || cell === 'RE') colIndices['RE'] = j;
-                    else if (cell.includes('PRE PI')) colIndices['PREPI'] = j;
-                    else if (cell === 'PI' || cell.includes(' PI ')) colIndices['PI'] = j;
-                    else if (cell.includes('FALLOUT')) colIndices['FALLOUT'] = j;
-                    else if (cell.includes('QC2')) colIndices['QC2'] = j;
-                    else if (cell === 'PS') colIndices['PS'] = j;
-                    else if (cell.includes('PS/RE')) colIndices['PS_RE'] = j;
-                    else if (cell.includes('PS/PI')) colIndices['PS_PI'] = j;
-                    else if (cell.includes('TTI')) colIndices['TTI'] = j;
-                }
-
-                const tbody = document.getElementById('table-body');
-                tbody.innerHTML = '';
-
-                let totalRE = 0, totalPREPI = 0, totalPI = 0, totalQC2 = 0, totalFallout = 0, totalPS = 0;
-                
-                const witelNames = [];
-                const psValues = [];
-
-                for (let i = headersRowIdx + 1; i < jsonData.length; i++) {
-                    const row = jsonData[i] || [];
-                    const witelVal = row[colIndices['WITEL']];
-                    if (!witelVal) continue;
-
-                    const witel = String(witelVal).trim();
-                    const re = Number(row[colIndices['RE']]) || 0;
-                    const prepi = Number(row[colIndices['PREPI']]) || 0;
-                    const pi = Number(row[colIndices['PI']]) || 0;
-                    const fallout = Number(row[colIndices['FALLOUT']]) || 0;
-                    const qc2 = Number(row[colIndices['QC2']]) || 0;
-                    const ps = Number(row[colIndices['PS']]) || 0;
-
-                    const ps_re = row[colIndices['PS_RE']] !== undefined ? Number(row[colIndices['PS_RE']]) : (re ? ps/re : 0);
-                    const ps_pi = row[colIndices['PS_PI']] !== undefined ? Number(row[colIndices['PS_PI']]) : (pi ? ps/pi : 0);
-                    const tti = row[colIndices['TTI']] !== undefined ? Number(row[colIndices['TTI']]) : 0;
-
-                    const isTotalRow = witel.toUpperCase() === 'TOTAL';
-
-                    if (isTotalRow) {
-                        totalRE = re;
-                        totalPREPI = prepi;
-                        totalPI = pi;
-                        totalQC2 = qc2;
-                        totalFallout = fallout;
-                        totalPS = ps;
-                    } else {
-                        witelNames.push(witel);
-                        psValues.push(ps);
-                    }
-
-                    const tr = document.createElement('tr');
-                    if (isTotalRow) {
-                        tr.className = "bg-slate-100 font-extrabold text-slate-900 border-t-2 border-slate-300";
-                    } else {
-                        tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
-                    }
-
-                    tr.innerHTML = `
-                        <td class="py-3.5 px-4 font-bold">${witel}</td>
-                        <td class="py-3.5 px-3 text-right font-semibold">${formatNumber(re)}</td>
-                        <td class="py-3.5 px-3 text-right text-slate-600">${formatNumber(prepi)}</td>
-                        <td class="py-3.5 px-3 text-right font-semibold text-purple-700">${formatNumber(pi)}</td>
-                        <td class="py-3.5 px-3 text-right font-semibold text-rose-600">${formatNumber(fallout)}</td>
-                        <td class="py-3.5 px-3 text-right font-semibold text-amber-600">${formatNumber(qc2)}</td>
-                        <td class="py-3.5 px-3 text-right font-extrabold text-emerald-600">${formatNumber(ps)}</td>
-                        <td class="py-3.5 px-4 text-center">${getBadgeHtml(ps_re, TARGET_PS_RE)}</td>
-                        <td class="py-3.5 px-4 text-center">${getBadgeHtml(ps_pi, TARGET_PS_PI)}</td>
-                        <td class="py-3.5 px-4 text-center">${getBadgeHtml(tti, TARGET_TTI)}</td>
-                    `;
-                    tbody.appendChild(tr);
-                }
-
-                // Update KPI Cards
-                document.getElementById('kpi-re').innerText = formatNumber(totalRE);
-                document.getElementById('kpi-pi').innerText = formatNumber(totalPI);
-                document.getElementById('kpi-qc2').innerText = formatNumber(totalQC2);
-                document.getElementById('kpi-fallout').innerText = formatNumber(totalFallout);
-                document.getElementById('kpi-ps').innerText = formatNumber(totalPS);
-
-                // Render Visualisasi Grafik Batang & Pie
-                renderCharts(witelNames, psValues, {
-                    prepi: totalPREPI,
-                    pi: totalPI,
-                    fallout: totalFallout,
-                    qc2: totalQC2,
-                    ps: totalPS
-                });
-
-                showStatus('<i class="fa-solid fa-circle-check mr-2"></i> Data berhasil dimuat dan diperbarui dari Sheet4!', 'success');
-
-            } catch (err) {
-                console.error(err);
-                showStatus('<i class="fa-solid fa-triangle-exclamation mr-2"></i> Gagal memproses data Sheet4: ' + err.message, 'error');
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400">Tidak ada data ditemukan.</td></tr>`;
+                return;
             }
+
+            data.forEach(d => {
+                let badgeOrder = 'bg-slate-100 text-slate-700';
+                if (d.ketOrder.toLowerCase() === 'complete') badgeOrder = 'bg-emerald-100 text-emerald-800 border border-emerald-300';
+                if (d.ketOrder.toLowerCase() === 'in progress') badgeOrder = 'bg-amber-100 text-amber-800 border border-amber-300';
+
+                let badgeLapangan = 'bg-slate-100 text-slate-700';
+                if (d.updateLapangan.toLowerCase() === 'done pt1') badgeLapangan = 'bg-blue-100 text-blue-800 border border-blue-300';
+                if (d.updateLapangan.toLowerCase() === 'proses pt1') badgeLapangan = 'bg-purple-100 text-purple-800 border border-purple-300';
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition';
+                tr.innerHTML = `
+                    <td class="py-3 px-4 text-center font-medium text-slate-500">${d.no}</td>
+                    <td class="py-3 px-4 font-semibold text-slate-800">${d.namaLokasi}</td>
+                    <td class="py-3 px-4 text-slate-600">${d.alamat}</td>
+                    <td class="py-3 px-4 text-center">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${badgeLapangan}">${d.updateLapangan}</span>
+                    </td>
+                    <td class="py-3 px-4 text-center">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${badgeOrder}">${d.ketOrder}</span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
 
-        async function fetchDataFromGitHub() {
-            const url = document.getElementById('github-url').value.trim();
-            const syncIcon = document.getElementById('btn-sync-icon');
-            syncIcon.classList.add('fa-spin');
-            
-            showStatus('<i class="fa-solid fa-spinner fa-spin mr-2"></i> Mengunduh file dari GitHub...', 'info');
+        function filterTable() {
+            const searchValue = document.getElementById('search-input').value.toLowerCase();
+            const filterValue = document.getElementById('filter-select').value.toLowerCase();
 
-            try {
-                const response = await fetch(url + '?v=' + new Date().getTime());
-                if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-                const data = await response.arrayBuffer();
-                const workbook = XLSX.read(data, { type: 'array' });
-                processWorkbook(workbook);
-            } catch (err) {
-                showStatus(`<i class="fa-solid fa-triangle-exclamation mr-2"></i> Gagal mengambil data dari GitHub: ${err.message}`, 'error');
-            } finally {
-                syncIcon.classList.remove('fa-spin');
-            }
+            const filtered = globalData.filter(d => {
+                const matchesSearch = d.namaLokasi.toLowerCase().includes(searchValue) || d.alamat.toLowerCase().includes(searchValue);
+                const matchesFilter = filterValue === '' || d.ketOrder.toLowerCase() === filterValue;
+                return matchesSearch && matchesFilter;
+            });
+
+            renderTable(filtered);
         }
 
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                processWorkbook(workbook);
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            fetchDataFromGitHub();
-        });
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', fetchData);
     </script>
 </body>
 </html>
