@@ -62,8 +62,8 @@
                 <h3 class="text-2xl font-extrabold text-blue-600 mt-2" id="val-done">0</h3>
             </div>
             <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-emerald-500">
-                <p class="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Achiave</p>
-                <h3 class="text-2xl font-extrabold text-emerald-600 mt-2" id="val-achiave">0%</h3>
+                <p class="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Achieve</p>
+                <h3 class="text-2xl font-extrabold text-emerald-600 mt-2" id="val-achieve">0%</h3>
             </div>
         </div>
 
@@ -99,7 +99,7 @@
                         <option value="jt">JT</option>
                         <option value="ogp">OGP</option>
                         <option value="done">Done</option>
-                        <option value="achiave">Achiave</option>
+                        <option value="achieve">Achieve</option>
                     </select>
                 </div>
             </div>
@@ -190,13 +190,13 @@
             const ogp = data.filter(d => d.ketOrder.toLowerCase() === 'in progress' || d.ketOrder.toLowerCase() === 'ogp').length;
             const done = data.filter(d => d.ketOrder.toLowerCase() === 'complete' || d.ketOrder.toLowerCase() === 'done').length;
             
-            const achiavePercent = totalOrder > 0 ? ((done / totalOrder) * 100).toFixed(1) : 0;
+            const achievePercent = totalOrder > 0 ? ((done / totalOrder) * 100).toFixed(1) : 0;
 
             document.getElementById('val-belum-input').textContent = belumInput;
             document.getElementById('val-jt').textContent = jt;
             document.getElementById('val-ogp').textContent = ogp;
             document.getElementById('val-done').textContent = done;
-            document.getElementById('val-achiave').textContent = achiavePercent + '%';
+            document.getElementById('val-achieve').textContent = achievePercent + '%';
         }
 
         function renderCharts(data) {
