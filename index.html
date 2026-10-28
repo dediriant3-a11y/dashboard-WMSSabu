@@ -91,14 +91,14 @@
                     <!-- Search Input -->
                     <input type="text" id="search-input" onkeyup="filterTable()" placeholder="Cari nama lokasi..." 
                         class="px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 flex-1 sm:w-64">
-                    <!-- Filter Select -->
+                    <!-- Filter Select Sesuai GSheet -->
                     <select id="filter-select" onchange="filterTable()" 
                         class="px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         <option value="">Semua Keterangan Order</option>
                         <option value="belum input">Belum Input</option>
-                        <option value="jt">JT</option>
-                        <option value="ogp">OGP</option>
-                        <option value="done">Done</option>
+                        <option value="jt">Proses JT</option>
+                        <option value="ogp">In Progress (OGP)</option>
+                        <option value="done">Complete (Done)</option>
                         <option value="achieve">Achieve</option>
                     </select>
                 </div>
@@ -187,8 +187,8 @@
             
             const belumInput = data.filter(d => !d.ketOrder || d.ketOrder === '-' || d.ketOrder.toLowerCase() === 'belum input').length;
             const jt = data.filter(d => d.ketOrder.toLowerCase().includes('jt')).length;
-            const ogp = data.filter(d => d.ketOrder.toLowerCase() === 'in progress' || d.ketOrder.toLowerCase() === 'ogp').length;
-            const done = data.filter(d => d.ketOrder.toLowerCase() === 'complete' || d.ketOrder.toLowerCase() === 'done').length;
+            const ogp = data.filter(d => d.ketOrder.toLowerCase() === 'in progress').length;
+            const done = data.filter(d => d.ketOrder.toLowerCase() === 'complete').length;
             
             const achievePercent = totalOrder > 0 ? ((done / totalOrder) * 100).toFixed(1) : 0;
 
@@ -260,9 +260,10 @@
             data.forEach(d => {
                 let badgeOrder = 'bg-slate-100 text-slate-700';
                 const lowerOrder = d.ketOrder.toLowerCase();
-                if (lowerOrder.includes('complete') || lowerOrder.includes('done')) badgeOrder = 'bg-emerald-100 text-emerald-800 border border-emerald-300';
-                else if (lowerOrder.includes('in progress') || lowerOrder.includes('ogp')) badgeOrder = 'bg-amber-100 text-amber-800 border border-amber-300';
+                if (lowerOrder.includes('complete')) badgeOrder = 'bg-emerald-100 text-emerald-800 border border-emerald-300';
+                else if (lowerOrder.includes('in progress')) badgeOrder = 'bg-amber-100 text-amber-800 border border-amber-300';
                 else if (lowerOrder.includes('jt')) badgeOrder = 'bg-rose-100 text-rose-800 border border-rose-300';
+                else if (lowerOrder.includes('belum input')) badgeOrder = 'bg-slate-200 text-slate-700 border border-slate-300';
 
                 let badgeLapangan = 'bg-slate-100 text-slate-700';
                 if (d.updateLapangan.toLowerCase() === 'done pt1') badgeLapangan = 'bg-blue-100 text-blue-800 border border-blue-300';
@@ -287,11 +288,26 @@
 
         function filterTable() {
             const searchValue = document.getElementById('search-input').value.toLowerCase();
-            const filterValue = document.getElementById('filter-select').value.toLowerCase();
+            const filterValue = document.getElementById('filter-select').value;
 
             const filtered = globalData.filter(d => {
                 const matchesSearch = d.namaLokasi.toLowerCase().includes(searchValue) || d.alamat.toLowerCase().includes(searchValue);
-                const matchesFilter = filterValue === '' || d.ketOrder.toLowerCase().includes(filterValue);
+                
+                let matchesFilter = true;
+                const lowerOrder = d.ketOrder.toLowerCase();
+
+                if (filterValue === 'belum input') {
+                    matchesFilter = !d.ketOrder || d.ketOrder === '-' || lowerOrder === 'belum input';
+                } else if (filterValue === 'jt') {
+                    matchesFilter = lowerOrder.includes('jt');
+                } else if (filterValue === 'ogp') {
+                    matchesFilter = lowerOrder === 'in progress';
+                } else if (filterValue === 'done') {
+                    matchesFilter = lowerOrder === 'complete';
+                } else if (filterValue === 'achieve') {
+                    matchesFilter = lowerOrder === 'complete'; // Achieve merepresentasikan data yang Complete
+                }
+
                 return matchesSearch && matchesFilter;
             });
 
