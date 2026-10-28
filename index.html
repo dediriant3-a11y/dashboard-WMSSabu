@@ -20,7 +20,7 @@
         <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex justify-between items-center">
             <div>
                 <h1 class="text-2xl font-bold tracking-tight">Dashboard Proyek WMS Sabu Raijua</h1>
-                <p class="text-indigo-200 text-sm mt-1">Monitoring Update Lapangan & Keterangan Order (Real-time CSV)</p>
+                <p class="text-indigo-200 text-sm mt-1">Monitoring Update Lapangan & Keterangan Order</p>
             </div>
             <button onclick="fetchData()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow flex items-center gap-2">
                 <i class="fa-solid font-bold fa-rotate"></i> Refresh Data
@@ -31,7 +31,7 @@
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
 
-        <!-- Metrics Cards sesuai Urutan Kolom O -->
+        <!-- Metrics Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
             <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                 <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Order</p>
@@ -55,7 +55,7 @@
             </div>
             <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-emerald-500">
                 <p class="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Achiave</p>
-                <h3 class="text-2xl font-extrabold text-emerald-600 mt-2" id="val-achiave">0</h3>
+                <h3 class="text-2xl font-extrabold text-emerald-600 mt-2" id="val-achiave">0%</h3>
             </div>
         </div>
 
@@ -174,20 +174,23 @@
         }
 
         function renderMetrics(data) {
-            document.getElementById('val-total-order').textContent = data.length;
+            const totalOrder = data.length;
+            document.getElementById('val-total-order').textContent = totalOrder;
             
-            // Hitung berdasarkan isi Kolom O (case-insensitive)
-            const belumInput = data.filter(d => d.ketOrder.toLowerCase() === 'belum input' || d.ketOrder === '-').length;
-            const jt = data.filter(d => d.ketOrder.toLowerCase() === 'jt').length;
-            const ogp = data.filter(d => d.ketOrder.toLowerCase() === 'ogp' || d.ketOrder.toLowerCase() === 'in progress').length; // OGP / In Progress
-            const done = data.filter(d => d.ketOrder.toLowerCase() === 'done').length;
-            const achiave = data.filter(d => d.ketOrder.toLowerCase() === 'achiave' || d.ketOrder.toLowerCase() === 'complete').length;
+            // Perhitungan Metrik sesuai permintaan
+            const belumInput = data.filter(d => !d.ketOrder || d.ketOrder === '-' || d.ketOrder.toLowerCase() === 'belum input').length;
+            const jt = data.filter(d => d.ketOrder.toLowerCase().includes('jt')).length;
+            const ogp = data.filter(d => d.ketOrder.toLowerCase() === 'in progress' || d.ketOrder.toLowerCase() === 'ogp').length;
+            const done = data.filter(d => d.ketOrder.toLowerCase() === 'complete' || d.ketOrder.toLowerCase() === 'done').length;
+            
+            // Achiave adalah persentase Done dibanding Total Order
+            const achiavePercent = totalOrder > 0 ? ((done / totalOrder) * 100).toFixed(1) : 0;
 
             document.getElementById('val-belum-input').textContent = belumInput;
             document.getElementById('val-jt').textContent = jt;
             document.getElementById('val-ogp').textContent = ogp;
             document.getElementById('val-done').textContent = done;
-            document.getElementById('val-achiave').textContent = achiave;
+            document.getElementById('val-achiave').textContent = achiavePercent + '%';
         }
 
         function renderCharts(data) {
@@ -209,7 +212,7 @@
                     labels: Object.keys(orderCounts),
                     datasets: [{
                         data: Object.values(orderCounts),
-                        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#64748b']
+                        backgroundColor: ['#10b981', '#f59e0b', '#3b82f6', '#ec4899', '#8b5cf6', '#64748b']
                     }]
                 },
                 options: {
@@ -251,10 +254,9 @@
             data.forEach(d => {
                 let badgeOrder = 'bg-slate-100 text-slate-700';
                 const lowerOrder = d.ketOrder.toLowerCase();
-                if (lowerOrder.includes('complete') || lowerOrder.includes('achiave')) badgeOrder = 'bg-emerald-100 text-emerald-800 border border-emerald-300';
+                if (lowerOrder.includes('complete') || lowerOrder.includes('done')) badgeOrder = 'bg-emerald-100 text-emerald-800 border border-emerald-300';
                 else if (lowerOrder.includes('in progress') || lowerOrder.includes('ogp')) badgeOrder = 'bg-amber-100 text-amber-800 border border-amber-300';
                 else if (lowerOrder.includes('jt')) badgeOrder = 'bg-rose-100 text-rose-800 border border-rose-300';
-                else if (lowerOrder.includes('done')) badgeOrder = 'bg-blue-100 text-blue-800 border border-blue-300';
 
                 let badgeLapangan = 'bg-slate-100 text-slate-700';
                 if (d.updateLapangan.toLowerCase() === 'done pt1') badgeLapangan = 'bg-blue-100 text-blue-800 border border-blue-300';
