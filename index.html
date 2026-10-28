@@ -17,14 +17,22 @@
 
     <!-- Header -->
     <header class="bg-indigo-700 text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex justify-between items-center">
+        <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div>
                 <h1 class="text-2xl font-bold tracking-tight">Dashboard Proyek WMS Sabu Raijua</h1>
                 <p class="text-indigo-200 text-sm mt-1">Monitoring Update Lapangan & Keterangan Order</p>
             </div>
-            <button onclick="fetchData()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow flex items-center gap-2">
-                <i class="fa-solid font-bold fa-rotate"></i> Refresh Data
-            </button>
+            <div class="flex items-center gap-3">
+                <!-- Tombol Lihat GSheet -->
+                <a href="https://docs.google.com/spreadsheets/d/1c9Nqigw0R5NSsYCr_KBXbVJGnhEQ9QZUB8_EAGfoDvM/edit?gid=0#gid=0" target="_blank" 
+                   class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow flex items-center gap-2">
+                    <i class="fa-solid fa-file-excel"></i> Lihat GSheet
+                </a>
+                <!-- Tombol Refresh -->
+                <button onclick="fetchData()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow flex items-center gap-2">
+                    <i class="fa-solid font-bold fa-rotate"></i> Refresh Data
+                </button>
+            </div>
         </div>
     </header>
 
@@ -177,13 +185,11 @@
             const totalOrder = data.length;
             document.getElementById('val-total-order').textContent = totalOrder;
             
-            // Perhitungan Metrik sesuai permintaan
             const belumInput = data.filter(d => !d.ketOrder || d.ketOrder === '-' || d.ketOrder.toLowerCase() === 'belum input').length;
             const jt = data.filter(d => d.ketOrder.toLowerCase().includes('jt')).length;
             const ogp = data.filter(d => d.ketOrder.toLowerCase() === 'in progress' || d.ketOrder.toLowerCase() === 'ogp').length;
             const done = data.filter(d => d.ketOrder.toLowerCase() === 'complete' || d.ketOrder.toLowerCase() === 'done').length;
             
-            // Achiave adalah persentase Done dibanding Total Order
             const achiavePercent = totalOrder > 0 ? ((done / totalOrder) * 100).toFixed(1) : 0;
 
             document.getElementById('val-belum-input').textContent = belumInput;
