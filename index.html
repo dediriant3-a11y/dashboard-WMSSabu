@@ -31,40 +31,44 @@
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
 
-        <!-- Metrics Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 mb-8">
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Lokasi</p>
-                <h3 class="text-3xl font-extrabold text-slate-800 mt-2" id="total-lokasi">0</h3>
+        <!-- Metrics Cards sesuai Urutan Kolom O -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Order</p>
+                <h3 class="text-2xl font-extrabold text-slate-800 mt-2" id="val-total-order">0</h3>
             </div>
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-emerald-500">
-                <p class="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Order Complete</p>
-                <h3 class="text-3xl font-extrabold text-emerald-600 mt-2" id="total-complete">0</h3>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-slate-400">
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Belum Input</p>
+                <h3 class="text-2xl font-extrabold text-slate-700 mt-2" id="val-belum-input">0</h3>
             </div>
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-amber-500">
-                <p class="text-xs font-semibold text-amber-600 uppercase tracking-wider">Order In Progress</p>
-                <h3 class="text-3xl font-extrabold text-amber-600 mt-2" id="total-inprogress">0</h3>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-rose-500">
+                <p class="text-xs font-semibold text-rose-600 uppercase tracking-wider">JT</p>
+                <h3 class="text-2xl font-extrabold text-rose-600 mt-2" id="val-jt">0</h3>
             </div>
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-blue-500">
-                <p class="text-xs font-semibold text-blue-600 uppercase tracking-wider">DONE PT1</p>
-                <h3 class="text-3xl font-extrabold text-blue-600 mt-2" id="total-done-pt1">0</h3>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-amber-500">
+                <p class="text-xs font-semibold text-amber-600 uppercase tracking-wider">OGP</p>
+                <h3 class="text-2xl font-extrabold text-amber-600 mt-2" id="val-ogp">0</h3>
             </div>
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-purple-500">
-                <p class="text-xs font-semibold text-purple-600 uppercase tracking-wider">Proses PT1</p>
-                <h3 class="text-3xl font-extrabold text-purple-600 mt-2" id="total-proses-pt1">0</h3>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-blue-500">
+                <p class="text-xs font-semibold text-blue-600 uppercase tracking-wider">Done</p>
+                <h3 class="text-2xl font-extrabold text-blue-600 mt-2" id="val-done">0</h3>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-emerald-500">
+                <p class="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Achiave</p>
+                <h3 class="text-2xl font-extrabold text-emerald-600 mt-2" id="val-achiave">0</h3>
             </div>
         </div>
 
         <!-- Charts Section -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                <h2 class="text-lg font-bold text-slate-800 mb-4">Statistik Keterangan Order (Kolom O)</h2>
+                <h2 class="text-lg font-bold text-slate-800 mb-4">Statistik Keterangan Order</h2>
                 <div class="relative h-64 flex justify-center">
                     <canvas id="orderChart"></canvas>
                 </div>
             </div>
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                <h2 class="text-lg font-bold text-slate-800 mb-4">Statistik Update Lapangan (Kolom N)</h2>
+                <h2 class="text-lg font-bold text-slate-800 mb-4">Statistik Update Lapangan</h2>
                 <div class="relative h-64 flex justify-center">
                     <canvas id="lapanganChart"></canvas>
                 </div>
@@ -82,9 +86,12 @@
                     <!-- Filter Select -->
                     <select id="filter-select" onchange="filterTable()" 
                         class="px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <option value="">Semua Status Order</option>
-                        <option value="Complete">Complete</option>
-                        <option value="In Progress">In Progress</option>
+                        <option value="">Semua Keterangan Order</option>
+                        <option value="belum input">Belum Input</option>
+                        <option value="jt">JT</option>
+                        <option value="ogp">OGP</option>
+                        <option value="done">Done</option>
+                        <option value="achiave">Achiave</option>
                     </select>
                 </div>
             </div>
@@ -96,8 +103,8 @@
                             <th class="py-3 px-4 w-12 text-center">No</th>
                             <th class="py-3 px-4">Nama Lokasi</th>
                             <th class="py-3 px-4">Alamat</th>
-                            <th class="py-3 px-4 text-center">Update Lapangan (Kolom N)</th>
-                            <th class="py-3 px-4 text-center">Keterangan Order (Kolom O)</th>
+                            <th class="py-3 px-4 text-center">Update Lapangan</th>
+                            <th class="py-3 px-4 text-center">Keterangan Order</th>
                         </tr>
                     </thead>
                     <tbody id="table-body" class="divide-y divide-slate-200">
@@ -139,8 +146,6 @@
         }
 
         function processData(rows) {
-            // Indeks Kolom: 
-            // 0: No, 1: Nama Lokasi, 5: Alamat, 13: Update lapangan (N), 14: Keterangan Order (O)
             const cleanRows = [];
             
             for (let i = 1; i < rows.length; i++) {
@@ -151,7 +156,6 @@
                 const updateLapangan = row[13] ? row[13].trim() : '-';
                 const ketOrder = row[14] ? row[14].trim() : '-';
 
-                // Validasi baris data (bukan header/kosong)
                 if (no && !isNaN(no) && namaLokasi) {
                     cleanRows.push({
                         no,
@@ -170,21 +174,23 @@
         }
 
         function renderMetrics(data) {
-            document.getElementById('total-lokasi').textContent = data.length;
+            document.getElementById('val-total-order').textContent = data.length;
             
-            const complete = data.filter(d => d.ketOrder.toLowerCase() === 'complete').length;
-            const inProgress = data.filter(d => d.ketOrder.toLowerCase() === 'in progress').length;
-            const donePt1 = data.filter(d => d.updateLapangan.toLowerCase() === 'done pt1').length;
-            const prosesPt1 = data.filter(d => d.updateLapangan.toLowerCase() === 'proses pt1').length;
+            // Hitung berdasarkan isi Kolom O (case-insensitive)
+            const belumInput = data.filter(d => d.ketOrder.toLowerCase() === 'belum input' || d.ketOrder === '-').length;
+            const jt = data.filter(d => d.ketOrder.toLowerCase() === 'jt').length;
+            const ogp = data.filter(d => d.ketOrder.toLowerCase() === 'ogp' || d.ketOrder.toLowerCase() === 'in progress').length; // OGP / In Progress
+            const done = data.filter(d => d.ketOrder.toLowerCase() === 'done').length;
+            const achiave = data.filter(d => d.ketOrder.toLowerCase() === 'achiave' || d.ketOrder.toLowerCase() === 'complete').length;
 
-            document.getElementById('total-complete').textContent = complete;
-            document.getElementById('total-inprogress').textContent = inProgress;
-            document.getElementById('total-done-pt1').textContent = donePt1;
-            document.getElementById('total-proses-pt1').textContent = prosesPt1;
+            document.getElementById('val-belum-input').textContent = belumInput;
+            document.getElementById('val-jt').textContent = jt;
+            document.getElementById('val-ogp').textContent = ogp;
+            document.getElementById('val-done').textContent = done;
+            document.getElementById('val-achiave').textContent = achiave;
         }
 
         function renderCharts(data) {
-            // Count data for Order Chart
             const orderCounts = {};
             const lapanganCounts = {};
 
@@ -193,11 +199,9 @@
                 lapanganCounts[d.updateLapangan] = (lapanganCounts[d.updateLapangan] || 0) + 1;
             });
 
-            // Destroy previous charts if exist
             if (orderChartInstance) orderChartInstance.destroy();
             if (lapanganChartInstance) lapanganChartInstance.destroy();
 
-            // Order Pie Chart
             const ctxOrder = document.getElementById('orderChart').getContext('2d');
             orderChartInstance = new Chart(ctxOrder, {
                 type: 'doughnut',
@@ -205,7 +209,7 @@
                     labels: Object.keys(orderCounts),
                     datasets: [{
                         data: Object.values(orderCounts),
-                        backgroundColor: ['#10b981', '#f59e0b', '#64748b']
+                        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#64748b']
                     }]
                 },
                 options: {
@@ -215,7 +219,6 @@
                 }
             });
 
-            // Lapangan Bar Chart
             const ctxLapangan = document.getElementById('lapanganChart').getContext('2d');
             lapanganChartInstance = new Chart(ctxLapangan, {
                 type: 'bar',
@@ -247,8 +250,11 @@
 
             data.forEach(d => {
                 let badgeOrder = 'bg-slate-100 text-slate-700';
-                if (d.ketOrder.toLowerCase() === 'complete') badgeOrder = 'bg-emerald-100 text-emerald-800 border border-emerald-300';
-                if (d.ketOrder.toLowerCase() === 'in progress') badgeOrder = 'bg-amber-100 text-amber-800 border border-amber-300';
+                const lowerOrder = d.ketOrder.toLowerCase();
+                if (lowerOrder.includes('complete') || lowerOrder.includes('achiave')) badgeOrder = 'bg-emerald-100 text-emerald-800 border border-emerald-300';
+                else if (lowerOrder.includes('in progress') || lowerOrder.includes('ogp')) badgeOrder = 'bg-amber-100 text-amber-800 border border-amber-300';
+                else if (lowerOrder.includes('jt')) badgeOrder = 'bg-rose-100 text-rose-800 border border-rose-300';
+                else if (lowerOrder.includes('done')) badgeOrder = 'bg-blue-100 text-blue-800 border border-blue-300';
 
                 let badgeLapangan = 'bg-slate-100 text-slate-700';
                 if (d.updateLapangan.toLowerCase() === 'done pt1') badgeLapangan = 'bg-blue-100 text-blue-800 border border-blue-300';
@@ -277,14 +283,13 @@
 
             const filtered = globalData.filter(d => {
                 const matchesSearch = d.namaLokasi.toLowerCase().includes(searchValue) || d.alamat.toLowerCase().includes(searchValue);
-                const matchesFilter = filterValue === '' || d.ketOrder.toLowerCase() === filterValue;
+                const matchesFilter = filterValue === '' || d.ketOrder.toLowerCase().includes(filterValue);
                 return matchesSearch && matchesFilter;
             });
 
             renderTable(filtered);
         }
 
-        // Initialize on load
         window.addEventListener('DOMContentLoaded', fetchData);
     </script>
 </body>
